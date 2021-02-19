@@ -1,2 +1,2 @@
 # PomodoTimer
-A nice idea of pomodoro timer.
+A nice idea base of pomodoro timer.
