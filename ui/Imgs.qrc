@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="Session">
+    <file>coffee.png</file>
+    <file>focus.png</file>
+  </qresource>
+</RCC>
