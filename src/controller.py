@@ -10,29 +10,76 @@ class Controller:
     START_SESSION = 0
     BREAK_SESSION = 1
 
-    def __init__(self, lcd_timer, img_label, start_time, break_time):
-        self.__start_time = start_time
+    def __init__(self, lcd_timer, img_label, focus_time, break_time):
+        self.__focus_time = focus_time
         self.__break_time = break_time
         self.__lcd_timer = lcd_timer
-        self.__time = self.__start_time
+        self.__time_minutes = self.__focus_time
+        self.__time_seconds = 0
         self.__session = self.START_SESSION
         self.__img_label = img_label
         self.__notification = ToastNotifier()
 
         # Initial Values
-        self.__lcd_timer.display(self.__start_time)
+        time_to_display = f'{self.__time_minutes}:{self.__time_seconds:02}'
+        self.__lcd_timer.display(time_to_display)
 
         self.__timer = QtCore.QTimer()
-        self.__timer.timeout.connect(self.update_lcd)
+        self.__timer.timeout.connect(self.__update_lcd)
 
     def start_timer(self):
-        self.__timer.start(10000)
+        self.__timer.start(1000)
+
+    def stop_timer(self):
+        self.__timer.stop()
 
     def get_session_status(self):
         return self.__session
 
-    def notify(self, breakSession=False):
-        if breakSession:
+    def switch_session(self):
+        self.__time_seconds = 0
+        self.__time_minutes = 0
+        self.__update_lcd(notify=False)
+
+    def update_controller(self, focus_time, break_time):
+        self.__focus_time = focus_time
+        self.__break_time = break_time
+        self.__time_minutes = 0
+        self.__time_seconds = 0
+        self.__update_lcd(notify=False, change_session=False)
+        self.start_timer()
+
+    def __update_lcd(self, notify=True, change_session=True):
+        self.__time_seconds -= 1
+        if self.__time_seconds <= 0:
+            self.__time_seconds = 59
+            self.__time_minutes -= 1
+
+        if self.__time_minutes < 0:
+            self.__time_seconds = 0
+
+            if self.__session == self.START_SESSION:
+                if change_session:
+                    self.__session = self.BREAK_SESSION
+                    self.__time_minutes = self.__break_time
+                else:
+                    self.__time_minutes = self.__focus_time
+            else:
+                if change_session:
+                    self.__session = self.START_SESSION
+                    self.__time_minutes = self.__focus_time
+                else:
+                    self.__time_minutes = self.__break_time
+
+            if notify:
+                self.__notify(self.__session == self.BREAK_SESSION)
+
+        time_to_display = f'{self.__time_minutes}:{self.__time_seconds:02}'
+        self.__lcd_timer.display(time_to_display)
+        self.__update_icon()
+
+    def __notify(self, break_session=False):
+        if break_session:
             tittle = 'Focus session is over! :D'
             msg = 'Focus session is over time, enjoy your break!.'
             icon_path = 'C:\\Repo\\Pomodor\\ui\\coffee.ico'
@@ -47,24 +94,6 @@ class Controller:
             icon_path=icon_path,
             threaded=True
         )
-
-    def update_lcd(self):
-        print('Time {}'.format(self.__time))
-        if self.__session == self.START_SESSION:
-            self.__time -= 1
-            if self.__time == 0:
-                self.__session = self.BREAK_SESSION
-                self.__time = self.__break_time
-                self.notify(breakSession=True)
-        else:
-            self.__time -= 1
-            if self.__time == 0:
-                self.__session = self.START_SESSION
-                self.__time = self.__start_time
-                self.notify()
-
-        self.__lcd_timer.display(self.__time)
-        self.__update_icon()
 
     def __update_icon(self):
         if self.__session == self.START_SESSION:

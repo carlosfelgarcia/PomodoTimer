@@ -1,0 +1,15 @@
+QTableWidget {
+     border-width: 3px;
+     border-style: solid;
+     border-radius: 6px;
+}
+QPushButton#start_btn {
+    background-color: green;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: beige;
+    font: bold 14px;
+    min-width: 10em;
+    padding: 6px;
+}
