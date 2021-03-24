@@ -161,6 +161,13 @@
         </spacer>
        </item>
        <item>
+        <widget class="QPushButton" name="save_apply_btn">
+         <property name="text">
+          <string>Save And Apply</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="save_btn">
          <property name="text">
           <string>Save</string>
