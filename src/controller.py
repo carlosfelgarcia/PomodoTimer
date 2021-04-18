@@ -27,6 +27,9 @@ class Controller:
         self.__timer = QtCore.QTimer()
         self.__timer.timeout.connect(self.__update_lcd)
 
+    def is_running(self):
+        return self.__timer.isActive()
+
     def start_timer(self):
         self.__timer.start(1000)
 
@@ -48,6 +51,28 @@ class Controller:
         self.__time_seconds = 0
         self.__update_lcd(notify=False, change_session=False)
         self.start_timer()
+
+    def notify(self, break_session=False, custom=None):
+        if custom:
+            tittle = custom['title']
+            msg = custom['msg']
+            icon_path = 'C:\\Repo\\Pomodor\\ui\\tomato.ico'
+
+        elif break_session:
+            tittle = 'Focus session is over! :D'
+            msg = 'Focus session is over time, enjoy your break!.'
+            icon_path = 'C:\\Repo\\Pomodor\\ui\\coffee.ico'
+        else:
+            tittle = 'Break session is over!'
+            msg = 'Break session is over time to go back and work.'
+            icon_path = 'C:\\Repo\\Pomodor\\ui\\focus.ico'
+
+        self.__notification.show_toast(
+            title=tittle,
+            msg=msg,
+            icon_path=icon_path,
+            threaded=True
+        )
 
     def __update_lcd(self, notify=True, change_session=True):
         self.__time_seconds -= 1
@@ -72,28 +97,11 @@ class Controller:
                     self.__time_minutes = self.__break_time
 
             if notify:
-                self.__notify(self.__session == self.BREAK_SESSION)
+                self.notify(self.__session == self.BREAK_SESSION)
 
         time_to_display = f'{self.__time_minutes}:{self.__time_seconds:02}'
         self.__lcd_timer.display(time_to_display)
         self.__update_icon()
-
-    def __notify(self, break_session=False):
-        if break_session:
-            tittle = 'Focus session is over! :D'
-            msg = 'Focus session is over time, enjoy your break!.'
-            icon_path = 'C:\\Repo\\Pomodor\\ui\\coffee.ico'
-        else:
-            tittle = 'Break session is over!'
-            msg = 'Break session is over time to go back and work.'
-            icon_path = 'C:\\Repo\\Pomodor\\ui\\focus.ico'
-
-        self.__notification.show_toast(
-            title=tittle,
-            msg=msg,
-            icon_path=icon_path,
-            threaded=True
-        )
 
     def __update_icon(self):
         if self.__session == self.START_SESSION:
