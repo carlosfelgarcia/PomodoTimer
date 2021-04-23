@@ -5,7 +5,7 @@ from threading import Timer
 
 from PyQt5 import QtCore
 
-import utils
+from . import utils
 
 
 class SchedulerHandle(QtCore.QObject):
@@ -18,7 +18,7 @@ class SchedulerHandle(QtCore.QObject):
     def __init__(self, slot_interval, schedule_info_lb):
         super(SchedulerHandle, self).__init__()
         self.__slot_interval = slot_interval
-        self.__timer = Timer(1.0, self.check_time)
+        self.__timer = Timer(0.01, self.check_time)
         self.__timer.start()
         self.__today_day = datetime.now().strftime("%A")
         self.__schedule_info_lb = schedule_info_lb
@@ -29,11 +29,15 @@ class SchedulerHandle(QtCore.QObject):
         if not schedule_day_hours:
             self.show_message.emit('No hours have been set for today, use timer it manually.')
             return
-        interval_time = self.is_valid_hour(schedule_day_hours)
-        if not interval_time:
+        interval_time, cmd = self.is_valid_hour(schedule_day_hours)
+
+        print('Interval time {}'.format(interval_time))
+
+        if cmd == 'stop':
             self.activate_timer.emit('stop')
-            self.__schedule_info_lb.setText('No time set on the schedule for the rest of the day. Running manual.')
-            return
+            if not interval_time:
+                self.__schedule_info_lb.setText('No time set on the schedule for the rest of the day. Running manual.')
+                return
         else:
             self.activate_timer.emit('start')
 
@@ -47,79 +51,33 @@ class SchedulerHandle(QtCore.QObject):
 
     def is_valid_hour(self, schedule_day_hours):
         current_time = datetime.now()
-        selected_time = None
         is_valid = False
         interval_time = 0
-        valid_counter = 1
-        slot_sec_interval = self.__slot_interval * self.INTERVAL_SEC
+        cmd = 'stop'
         schedule_hours = sorted(schedule_day_hours)
         for index in range(len(schedule_hours)):
             hour, minutes = map(lambda value: int(value), schedule_hours[index].split(':'))
             time = datetime(current_time.year, current_time.month, current_time.day, hour, minutes)
             slot_time = time + timedelta(minutes=self.__slot_interval)
 
-            if slot_time > time:
-                delta = current_time - slot_time
-                total_sec = delta.total_seconds()
+            if time <= current_time <= slot_time and not is_valid:
+                is_valid = True
 
-                if total_sec < 0:
-                    continue
-
-                elif 0 < total_sec <= 900:
-                    interval_time = delta.seconds
-                    continue
-
-            elif current_time < time:
-                if selected_time:
-                    delta = time - selected_time
-                else:
-                    delta = time - current_time
-                total_sec = delta.total_seconds()
-                if 0 < total_sec <= 900:
-                    interval_time += total_sec
-                    selected_time = time
-                    continue
-                else:
+            if is_valid:
+                str_slot_time = f'{slot_time.hour:02}:{slot_time.minute:02}'
+                if str_slot_time not in schedule_hours:
+                    delta = slot_time - current_time
+                    interval_time = delta.total_seconds()
+                    cmd = 'start'
                     break
 
+        if not interval_time:
+            for index in range(len(schedule_hours)):
+                hour, minutes = map(lambda value: int(value), schedule_hours[index].split(':'))
+                time = datetime(current_time.year, current_time.month, current_time.day, hour, minutes)
+                if current_time < time:
+                    delta = time - current_time
+                    interval_time = delta.total_seconds()
+                    break
 
-
-
-
-
-
-
-
-            # if not is_valid and current_time <= time:
-            #     selected_time = current_time
-            #     is_valid = True
-            #     if index == len(schedule_hours) - 1:
-            #         next_time = time + timedelta(minutes=self.__slot_interval)
-            #     else:
-            #         next_hour, next_minutes = map(lambda value: int(value), schedule_hours[index + 1].split(':'))
-            #         next_time = datetime(current_time.year, current_time.month, current_time.day, next_hour,
-            #                              next_minutes)
-            #
-            # if is_valid:
-            #     dif_time =
-            #
-            #
-            #
-            #
-            #     if delta.seconds == slot_sec_interval * valid_counter:
-            #         print('In selected')
-            #         valid_counter += 1
-            #         continue
-            #     elif delta.seconds > slot_sec_interval:
-            #         print('In NOT selected')
-            #         interval_time = delta.seconds
-            #         break
-            #     elif delta.seconds < slot_sec_interval:
-            #         print('In selected')
-            #         interval_time = delta.seconds
-            #         break
-            #     else:
-            #         print('In else')
-            #         interval_time = slot_sec_interval * valid_counter
-
-        return interval_time
+        return interval_time, cmd

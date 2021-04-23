@@ -9,9 +9,9 @@ from datetime import datetime, timedelta
 
 from PyQt5 import QtWidgets, QtGui
 
-import utils
-from controller import Controller
-from scheduler_handle import SchedulerHandle
+import src.utils
+from src import Controller
+from src import SchedulerHandle
 from ui import Ui_PomodorWindow
 from ui import Ui_pomodor_config
 
@@ -26,8 +26,8 @@ class Pomodor(QtWidgets.QMainWindow):
         super(Pomodor, self).__init__(parent=parent)
         self.ui = Ui_PomodorWindow()
         self.ui.setupUi(self)
-        self.config_file_path = utils.get_config_file_path()
-        self.__config_data = utils.get_config_data()
+        self.config_file_path = src.utils.get_config_file_path()
+        self.__config_data = src.utils.get_config_data()
 
         # Connections
         self.ui.act_set_times.triggered.connect(self.__show_config)
@@ -106,7 +106,7 @@ class Pomodor(QtWidgets.QMainWindow):
         self.__set_table_items()
 
     def __set_table_items(self):
-        config_data = utils.get_config_data()
+        config_data = src.utils.get_config_data()
         total_columns = self.ui.scheduler_table.columnCount()
         total_rows = self.ui.scheduler_table.rowCount()
         for column in range(total_columns).__reversed__():
@@ -132,7 +132,7 @@ class Pomodor(QtWidgets.QMainWindow):
                 new_item.setBackground(self.BACKGROUND_COLOR)
 
     def __save_schedule_info(self):
-        config_data = utils.get_config_data()
+        config_data = src.utils.get_config_data()
         times_to_add = defaultdict(list)
         times_to_remove = defaultdict(list)
         for item in self.ui.scheduler_table.selectedItems():
@@ -156,7 +156,7 @@ class Pomodor(QtWidgets.QMainWindow):
             for hour in hours:
                 config_data['schedule_times'][day].remove(hour)
 
-        utils.save_config_data(config_data)
+        src.utils.save_config_data(config_data)
         self.ui.scheduler_table.clearSelection()
         self.msg_dialog('Schedule has been save.')
 
@@ -180,7 +180,7 @@ class Pomodor(QtWidgets.QMainWindow):
         self.config_dialog.show()
 
         # Set initial values
-        config_data = utils.get_config_data()
+        config_data = src.utils.get_config_data()
         if config_data:
             self.config_ui.focus_time_sb.setValue(config_data['focus_time'])
             self.config_ui.break_time_sb.setValue(config_data['break_time'])
@@ -193,14 +193,14 @@ class Pomodor(QtWidgets.QMainWindow):
         self.config_ui.save_apply_btn.clicked.connect(lambda: self.__update_timer(True))
 
     def __save_config_file(self):
-        config_data = utils.get_config_data()
+        config_data = src.utils.get_config_data()
         focus_time = self.config_ui.focus_time_sb.value()
         break_time = self.config_ui.break_time_sb.value()
         quotes_file = self.config_ui.quotes_file_txt.toPlainText()
         config_data['focus_time'] = focus_time
         config_data['break_time'] = break_time
         config_data['quotes_file'] = quotes_file
-        utils.save_config_data(config_data)
+        src.utils.save_config_data(config_data)
         self.config_dialog.close()
 
     def __update_timer(self, save):
@@ -215,7 +215,7 @@ class Pomodor(QtWidgets.QMainWindow):
             self.config_ui.quotes_file_txt.setText(file_path)
 
     def __set_quote(self):
-        config_data = utils.get_config_data()
+        config_data = src.utils.get_config_data()
         if not config_data:
             self.ui.timer_lb.setText('Procrastination only leads to frustration')
             return
@@ -235,7 +235,7 @@ class Pomodor(QtWidgets.QMainWindow):
         self.ui.timer_lb.setText(quote)
 
     def __get_times(self):
-        config_data = utils.get_config_data()
+        config_data = src.utils.get_config_data()
         if not config_data:
             self.__focus_time = 1
             self.__break_time = 2
