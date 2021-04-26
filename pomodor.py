@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 
 from PyQt5 import QtWidgets, QtGui
 
+import src.admin
 import src.utils
 from src import Controller
 from src import SchedulerHandle
@@ -21,6 +22,12 @@ class Pomodor(QtWidgets.QMainWindow):
     SLOT_INTERVALS = 15
     BACKGROUND_COLOR = QtGui.QBrush(QtGui.QColor(0, 176, 224))
     WHITE_COLOR = QtGui.QBrush(QtGui.QColor("white"))
+    SITES_TO_BLOCK = [
+        "www.facebook.com",
+        "facebook.com",
+        "www.youtube.com",
+        "youtube.com",
+    ]
 
     def __init__(self, parent=None):
         super(Pomodor, self).__init__(parent=parent)
@@ -55,6 +62,7 @@ class Pomodor(QtWidgets.QMainWindow):
             self.ui.session_img_lb,
             focus_time=self.__focus_time,
             break_time=self.__break_time,
+            sites_to_block=self.SITES_TO_BLOCK
         )
 
         self.__scheduler_handle = SchedulerHandle(self.SLOT_INTERVALS, self.ui.scheduler_info_lb)
@@ -246,9 +254,15 @@ class Pomodor(QtWidgets.QMainWindow):
 
         return self.__focus_time, self.__break_time
 
-
-if __name__ == "__main__":
+def main():
     app = QtWidgets.QApplication(sys.argv)
     pomodor = Pomodor()
     pomodor.show()
     sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    if not src.admin.is_user_admin():
+        src.admin.run_win_as_admin(wait=False)
+    else:
+        main()

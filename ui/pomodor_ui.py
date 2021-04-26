@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+#  Carlos Garcia. Copyright (c) 2021.
+#  This code is licensed under MIT license (see LICENSE file for details)
+
 # Form implementation generated from reading ui file 'C:\Repo\Pomodor\ui\pomodor_ui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
@@ -213,3 +216,4 @@ class Ui_PomodorWindow(object):
         self.save_schedule_btn.setText(_translate("PomodorWindow", "Save Schedule"))
         self.menuConfig.setTitle(_translate("PomodorWindow", "Config"))
         self.act_set_times.setText(_translate("PomodorWindow", "Set times"))
+
