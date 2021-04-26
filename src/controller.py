@@ -4,13 +4,15 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from win10toast import ToastNotifier
 
+from .blocker import Blocker
+
 
 class Controller:
 
     START_SESSION = 0
     BREAK_SESSION = 1
 
-    def __init__(self, lcd_timer, img_label, focus_time, break_time):
+    def __init__(self, lcd_timer, img_label, focus_time, break_time, sites_to_block):
         self.__focus_time = focus_time
         self.__break_time = break_time
         self.__lcd_timer = lcd_timer
@@ -19,6 +21,7 @@ class Controller:
         self.__session = self.START_SESSION
         self.__img_label = img_label
         self.__notification = ToastNotifier()
+        self.__blocker = Blocker(sites_to_block)
 
         # Initial Values
         time_to_display = f'{self.__time_minutes}:{self.__time_seconds:02}'
@@ -101,10 +104,12 @@ class Controller:
 
         time_to_display = f'{self.__time_minutes}:{self.__time_seconds:02}'
         self.__lcd_timer.display(time_to_display)
-        self.__update_icon()
+        self.__set_session_attrs()
 
-    def __update_icon(self):
+    def __set_session_attrs(self):
         if self.__session == self.START_SESSION:
             self.__img_label.setPixmap(QtGui.QPixmap(":/Session/focus.png"))
+            self.__blocker.block_sites()
         else:
             self.__img_label.setPixmap(QtGui.QPixmap(":/Session/coffee.png"))
+            self.__blocker.unblock_sites()

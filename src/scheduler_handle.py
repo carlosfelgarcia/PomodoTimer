@@ -28,6 +28,7 @@ class SchedulerHandle(QtCore.QObject):
         schedule_day_hours = config_data['schedule_times'].get(self.__today_day, None)
         if not schedule_day_hours:
             self.show_message.emit('No hours have been set for today, use timer it manually.')
+            self.__schedule_info_lb.setText('Running on manual mode')
             return
         interval_time, cmd = self.is_valid_hour(schedule_day_hours)
 
