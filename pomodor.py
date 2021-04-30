@@ -23,10 +23,14 @@ class Pomodor(QtWidgets.QMainWindow):
     BACKGROUND_COLOR = QtGui.QBrush(QtGui.QColor(0, 176, 224))
     WHITE_COLOR = QtGui.QBrush(QtGui.QColor("white"))
     SITES_TO_BLOCK = [
-        "www.facebook.com",
-        "facebook.com",
-        "www.youtube.com",
-        "youtube.com",
+        'www.facebook.com',
+        'facebook.com',
+        'www.youtube.com',
+        'youtube.com',
+        'm.youtube.com',
+        'host.youtube.com',
+        'mx.youtube.com',
+        'http.youtube.com'
     ]
 
     def __init__(self, parent=None):
@@ -43,6 +47,7 @@ class Pomodor(QtWidgets.QMainWindow):
         self.ui.start_btn.clicked.connect(self.start)
         self.ui.switch_btn.clicked.connect(self.__switch_session)
         self.ui.save_schedule_btn.clicked.connect(self.__save_schedule_info)
+        self.ui.save_apply_schedule_btn.clicked.connect(self.__save_apply_schedule)
 
         # Stylesheet
         style_sheet_file = os.path.join(os.path.dirname(self.config_file_path), 'style_sheet.txt')
@@ -100,6 +105,10 @@ class Pomodor(QtWidgets.QMainWindow):
             }
         if msg:
             self.__controller.notify(custom=msg)
+
+    def __save_apply_schedule(self):
+        self.__save_schedule_info()
+        self.__scheduler_handle.restart_timer()
 
     def __switch_session(self):
         self.__controller.switch_session()

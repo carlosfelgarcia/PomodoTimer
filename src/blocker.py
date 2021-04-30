@@ -17,7 +17,7 @@ class Blocker:
             hosts = host_file.read()
             for site in self.__sites_to_block:
                 if site not in hosts:
-                    line_to_write = f'{self.redirect_url}  {site}\n'
+                    line_to_write = f'{self.redirect_url}              {site}\n'
                     host_file.write(line_to_write)
 
     def unblock_sites(self):

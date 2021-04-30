@@ -23,6 +23,13 @@ class SchedulerHandle(QtCore.QObject):
         self.__today_day = datetime.now().strftime("%A")
         self.__schedule_info_lb = schedule_info_lb
 
+    def restart_timer(self):
+        if self.__timer.is_alive():
+            self.__timer.cancel()
+
+        self.__timer = Timer(0.01, self.check_time)
+        self.__timer.start()
+
     def check_time(self):
         config_data = utils.get_config_data()
         schedule_day_hours = config_data['schedule_times'].get(self.__today_day, None)
@@ -31,8 +38,6 @@ class SchedulerHandle(QtCore.QObject):
             self.__schedule_info_lb.setText('Running on manual mode')
             return
         interval_time, cmd = self.is_valid_hour(schedule_day_hours)
-
-        print('Interval time {}'.format(interval_time))
 
         if cmd == 'stop':
             self.activate_timer.emit('stop')
