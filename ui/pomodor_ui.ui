@@ -482,7 +482,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="act_set_times">
    <property name="text">
-    <string>Set times</string>
+    <string>Settings</string>
    </property>
   </action>
  </widget>

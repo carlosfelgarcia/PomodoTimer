@@ -22,16 +22,6 @@ class Pomodor(QtWidgets.QMainWindow):
     SLOT_INTERVALS = 15
     BACKGROUND_COLOR = QtGui.QBrush(QtGui.QColor(0, 176, 224))
     WHITE_COLOR = QtGui.QBrush(QtGui.QColor("white"))
-    SITES_TO_BLOCK = [
-        'www.facebook.com',
-        'facebook.com',
-        'www.youtube.com',
-        'youtube.com',
-        'm.youtube.com',
-        'host.youtube.com',
-        'mx.youtube.com',
-        'http.youtube.com'
-    ]
 
     def __init__(self, parent=None):
         super(Pomodor, self).__init__(parent=parent)
@@ -67,7 +57,6 @@ class Pomodor(QtWidgets.QMainWindow):
             self.ui.session_img_lb,
             focus_time=self.__focus_time,
             break_time=self.__break_time,
-            sites_to_block=self.SITES_TO_BLOCK
         )
 
         self.__scheduler_handle = SchedulerHandle(self.SLOT_INTERVALS, self.ui.scheduler_info_lb)
@@ -210,13 +199,24 @@ class Pomodor(QtWidgets.QMainWindow):
         self.config_ui.save_apply_btn.clicked.connect(lambda: self.__update_timer(True))
 
     def __save_config_file(self):
+        youtube = ["www.youtube.com", "youtube.com"]
+        facebook = ["www.facebook.com", "facebook.com"]
+        twitter = ["www.twitter.com", "twitter.com"]
         config_data = src.utils.get_config_data()
         focus_time = self.config_ui.focus_time_sb.value()
         break_time = self.config_ui.break_time_sb.value()
         quotes_file = self.config_ui.quotes_file_txt.toPlainText()
+        config_data['sites'] = []
+        if self.config_ui.youtube_cbx.isChecked():
+            config_data['sites'].extend(youtube)
+        if self.config_ui.twitter_cbx.isChecked():
+            config_data['sites'].extend(twitter)
+        if self.config_ui.facebook_cbx.isChecked():
+            config_data['sites'].extend(facebook)
         config_data['focus_time'] = focus_time
         config_data['break_time'] = break_time
         config_data['quotes_file'] = quotes_file
+
         src.utils.save_config_data(config_data)
         self.config_dialog.close()
 
@@ -262,6 +262,7 @@ class Pomodor(QtWidgets.QMainWindow):
         self.__break_time = config_data['break_time']
 
         return self.__focus_time, self.__break_time
+
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
