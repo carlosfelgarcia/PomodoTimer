@@ -12,7 +12,7 @@ class Controller:
     START_SESSION = 0
     BREAK_SESSION = 1
 
-    def __init__(self, lcd_timer, img_label, focus_time, break_time, sites_to_block):
+    def __init__(self, lcd_timer, img_label, focus_time, break_time):
         self.__focus_time = focus_time
         self.__break_time = break_time
         self.__lcd_timer = lcd_timer
@@ -21,7 +21,7 @@ class Controller:
         self.__session = self.START_SESSION
         self.__img_label = img_label
         self.__notification = ToastNotifier()
-        self.__blocker = Blocker(sites_to_block)
+        self.__blocker = Blocker()
 
         # Initial Values
         time_to_display = f'{self.__time_minutes}:{self.__time_seconds:02}'

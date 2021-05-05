@@ -215,5 +215,6 @@ class Ui_PomodorWindow(object):
         self.save_apply_schedule_btn.setText(_translate("PomodorWindow", "Save Schedule and Apply"))
         self.save_schedule_btn.setText(_translate("PomodorWindow", "Save Schedule"))
         self.menuConfig.setTitle(_translate("PomodorWindow", "Config"))
-        self.act_set_times.setText(_translate("PomodorWindow", "Set times"))
+        self.act_set_times.setText(_translate("PomodorWindow", "Settings"))
 
+from . import Imgs_rc
