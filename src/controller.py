@@ -1,5 +1,7 @@
 #  Carlos Garcia. Copyright (c) 2021.
 #  This code is licensed under MIT license (see LICENSE file for details)
+import time
+
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 from win10toast import ToastNotifier
@@ -52,7 +54,7 @@ class Controller:
         self.__break_time = break_time
         self.__time_minutes = 0
         self.__time_seconds = 0
-        self.__update_lcd(notify=False, change_session=False)
+        self.__update_lcd(notify=False, change_session=False, update=True)
         self.start_timer()
 
     def notify(self, break_session=False, custom=None):
@@ -77,7 +79,7 @@ class Controller:
             threaded=True
         )
 
-    def __update_lcd(self, notify=True, change_session=True):
+    def __update_lcd(self, notify=True, change_session=True, update=False):
         self.__time_seconds -= 1
         if self.__time_seconds <= 0:
             self.__time_seconds = 59
@@ -104,12 +106,20 @@ class Controller:
 
         time_to_display = f'{self.__time_minutes}:{self.__time_seconds:02}'
         self.__lcd_timer.display(time_to_display)
-        self.__set_session_attrs()
+        self.__set_session_attrs(change_session, update)
 
-    def __set_session_attrs(self):
-        if self.__session == self.START_SESSION:
-            self.__img_label.setPixmap(QtGui.QPixmap(":/Session/focus.png"))
-            self.__blocker.block_sites()
-        else:
-            self.__img_label.setPixmap(QtGui.QPixmap(":/Session/coffee.png"))
+    def __set_session_attrs(self, change_session, update):
+        if update:
             self.__blocker.unblock_sites()
+            # Sleep for 1 second so the file can be saved and os lock is lifted
+            time.sleep(1)
+            self.__blocker.update_sites()
+            self.__blocker.block_sites()
+
+        if change_session:
+            if self.__session == self.START_SESSION:
+                self.__img_label.setPixmap(QtGui.QPixmap(":/Session/focus.png"))
+                self.__blocker.block_sites()
+            else:
+                self.__img_label.setPixmap(QtGui.QPixmap(":/Session/coffee.png"))
+                self.__blocker.unblock_sites()
