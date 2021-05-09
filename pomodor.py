@@ -82,12 +82,20 @@ class Pomodor(QtWidgets.QMainWindow):
         msg = None
         if cmd == 'start' and not self.is_running():
             self.start()
+            if self.__controller.is_on_break():
+                self.__switch_session()
+            else:
+                self.__update_timer(False)
             msg = {
                 'title': 'Pomodoro Schedule',
                 'msg': 'Schedule time starts now!'
             }
         elif cmd == 'stop' and self.is_running():
             self.stop()
+            if not self.__controller.is_on_break():
+                self.__switch_session()
+            else:
+                self.__update_timer(False)
             msg = {
                 'title': 'Pomodoro Schedule',
                 'msg': 'No time schedule at this time. Timer has been stopped.'

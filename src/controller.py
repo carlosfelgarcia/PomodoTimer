@@ -44,6 +44,9 @@ class Controller:
     def get_session_status(self):
         return self.__session
 
+    def is_on_break(self):
+        return self.__session == self.BREAK_SESSION
+
     def switch_session(self):
         self.__time_seconds = 0
         self.__time_minutes = 0
