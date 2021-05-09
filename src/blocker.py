@@ -2,6 +2,8 @@
 #  This code is licensed under MIT license (see LICENSE file for details)
 
 # This code has been modified from https://github.com/Kalebu/Website-blocker-python/blob/master/app.py
+import os
+import json
 
 from . import utils
 
@@ -12,7 +14,8 @@ class Blocker:
     redirect_url = '127.0.0.1'
 
     def __init__(self):
-        self.__sites_to_block = self.__get_sites_to_block()
+        self.__sites_to_block = []
+        self.update_sites()
 
     def block_sites(self):
         with open(self.window_host, "r+") as host_file:
@@ -31,8 +34,21 @@ class Blocker:
                     host_file.write(host)
             host_file.truncate()
 
+    def update_sites(self):
+        self.__sites_to_block = self.__get_sites_to_block()
+
     @staticmethod
     def __get_sites_to_block():
         config_data = utils.get_config_data()
-        sites_to_block = config_data.get('sites', [])
+        sites_names = config_data.get('sites', [])
+
+        config_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config')
+        sites_file_path = os.path.join(config_dir, 'sites.json')
+        with open(sites_file_path, 'r') as sites_file:
+            sites = json.load(sites_file)
+
+        sites_to_block = []
+        for siteName in sites_names:
+            sites_to_block.extend(sites[siteName])
+
         return sites_to_block

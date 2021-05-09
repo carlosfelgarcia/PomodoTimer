@@ -191,6 +191,9 @@ class Pomodor(QtWidgets.QMainWindow):
             self.config_ui.focus_time_sb.setValue(config_data['focus_time'])
             self.config_ui.break_time_sb.setValue(config_data['break_time'])
             self.config_ui.quotes_file_txt.setText(config_data['quotes_file'])
+            self.config_ui.facebook_cbx.setChecked('facebook' in config_data['sites'])
+            self.config_ui.twitter_cbx.setChecked('twitter' in config_data['sites'])
+            self.config_ui.youtube_cbx.setChecked('youtube' in config_data['sites'])
 
         # connections
         self.config_ui.save_btn.clicked.connect(self.__save_config_file)
@@ -199,20 +202,17 @@ class Pomodor(QtWidgets.QMainWindow):
         self.config_ui.save_apply_btn.clicked.connect(lambda: self.__update_timer(True))
 
     def __save_config_file(self):
-        youtube = ["www.youtube.com", "youtube.com"]
-        facebook = ["www.facebook.com", "facebook.com"]
-        twitter = ["www.twitter.com", "twitter.com"]
         config_data = src.utils.get_config_data()
         focus_time = self.config_ui.focus_time_sb.value()
         break_time = self.config_ui.break_time_sb.value()
         quotes_file = self.config_ui.quotes_file_txt.toPlainText()
         config_data['sites'] = []
         if self.config_ui.youtube_cbx.isChecked():
-            config_data['sites'].extend(youtube)
+            config_data['sites'].append('youtube')
         if self.config_ui.twitter_cbx.isChecked():
-            config_data['sites'].extend(twitter)
+            config_data['sites'].append('twitter')
         if self.config_ui.facebook_cbx.isChecked():
-            config_data['sites'].extend(facebook)
+            config_data['sites'].append('facebook')
         config_data['focus_time'] = focus_time
         config_data['break_time'] = break_time
         config_data['quotes_file'] = quotes_file
